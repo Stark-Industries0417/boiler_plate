@@ -3,9 +3,10 @@ const app = express();
 const port = 5000;
 const config = require('./config/key');
 const cookieParser = require('cookie-parser');
-
+const {auth} = require('./middleware/auth');
 const {User} = require('./models/User');
 const mongoose = require('mongoose');
+
 mongoose.connect(config.mongoURI)
   .then(() => console.log('MongoDB Connected...'))
   .catch(e => console.log(e));
@@ -16,7 +17,7 @@ app.use(cookieParser());
 
 
 app.get('/', (req, res) => res.send('Hello World!'));
-app.post('/register', (req, res) => {
+app.post('/api/users/register', (req, res) => {
     const user = new User(req.body);
 
     user.save((err, userInfo) => {
@@ -28,7 +29,7 @@ app.post('/register', (req, res) => {
 
 })
 
-app.post('/login', (req, res) => {
+app.post('/api/users/login', (req, res) => {
 
     User.findOne({email: req.body.email}, (err, user) => {
         if(!user) {
@@ -51,6 +52,30 @@ app.post('/login', (req, res) => {
     })
 })
 
+app.get('/api/users/auth', auth, (req, res) => {
+    // 미들웨어인 auth 에서 에러 생기지 않았다는 것은 Authentication 이 True 라는 것.
+    res.status(200).json({
+        _id: req.user._id,
+        isAdmin: req.user.role == 0 ? false : true,
+        isAuth: ture,
+        email: req.user.email,
+        name: req.user.name,
+        lastname: req.user.lastname,
+        role: req.user.role,
+        image: req.user.image
+    })
+})
+
+app.get('/api/users/logout', auth, (req, res) => {
+    User.findOneAndUpdate({_id: req.user._id},
+        {token: ""},
+        (err, user) => {
+            if(err) return res.json({success: false, err});
+            return res.status(200).send({
+                success: true
+            })
+        })
+})
 
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
