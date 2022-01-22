@@ -3,6 +3,7 @@ const app = express();
 const port = 5000;
 const config = require('./config/key');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 const {auth} = require('./middleware/auth');
 const {User} = require('./models/User');
 const mongoose = require('mongoose');
@@ -11,12 +12,19 @@ mongoose.connect(config.mongoURI)
   .then(() => console.log('MongoDB Connected...'))
   .catch(e => console.log(e));
 
+
+
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors());
+
 
 
 app.get('/', (req, res) => res.send('Hello World!'));
+
+
+
 app.post('/api/users/register', (req, res) => {
     const user = new User(req.body);
 
@@ -76,6 +84,7 @@ app.get('/api/users/logout', auth, (req, res) => {
             })
         })
 })
+
 
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
