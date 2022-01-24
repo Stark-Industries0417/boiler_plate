@@ -20,15 +20,14 @@ function LoginPage(props) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
 
     const onSubmitHandler = e => {
         e.preventDefault();
 
+        const loginInfo = new FormData(e.target);
         let body = {
-            email,
-            password
+            email: loginInfo.get('email'),
+            password: loginInfo.get('password')
         }
         dispatch(loginUser(body))
             .then(res => {
@@ -53,6 +52,7 @@ function LoginPage(props) {
                     justifyContent: 'center',
                 }}>
                     <Box
+                    onSubmit={onSubmitHandler}
                     component="form"
                     sx={{
                         '& .MuiTextField-root': { m: 1, width: '25ch' },
@@ -86,7 +86,8 @@ function LoginPage(props) {
                             />
                         </Grid>
                         <Grid item>
-                            <Button 
+                            <Button
+                                type='submit' 
                                 variant='contained'
                                 style={{
                                     width: 325,
