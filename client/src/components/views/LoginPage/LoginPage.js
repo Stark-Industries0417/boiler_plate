@@ -100,6 +100,7 @@ function LoginPage(props) {
                         <Grid>
                             <Button
                                 variant='outlined'
+                                onClick={() => navigate('/register')}
                                 style={{
                                     width: 325,
                                     padding: 13,
